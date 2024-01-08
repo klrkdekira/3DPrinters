@@ -1,8 +1,181 @@
+# FLSun Super Racer
+
+## Klipper preparation
+
+Use [Raspberry Pi Imager](https://www.raspberrypi.com/software/) 
+
+### On Linux
+
+```
+sudo apt install rpi-imager
+```
+
+## Flash Guide
+
+Main board is MKS Robin Nano V3
+
+![flash guide](/FLSun_SR/assets/flash.png)
+
+```
+make clean
+make menuconfig
+make
+```
+
+Rename `klipper.bin` to `Robin_nano_v3.bin`.
+
+## Calibration Steps
+
+1. Z-Offset
+2. Delta Calibrate
+3. Bed Leveling
+
+## ADXL345
+
+Enable SPI mode via `raspi-config`.
+
+Install the following 
+
+```
+sudo apt update
+sudo apt install python3-numpy python3-matplotlib libatlas-base-dev
+```
+
+Enable Klipper MCU on the Raspberry Pi
+
+```
+cd ~/klipper/
+sudo cp ./scripts/klipper-mcu.service /etc/systemd/system/
+sudo systemctl enable klipper-mcu.service
+```
+
+Flash Klipper MCU
+
+```
+cd ~/klipper/
+make menuconfig
+```
+
+In the menu, set "Microcontroller Architecture" to "Linux process," then save and exit.
+
+```
+sudo systemctl stop klipper-mcu.service
+make flash
+sudo systemctl start klipper-mcu.service
+```
+
+Additional Klipper Config
+
+```
+[mcu rpi]
+serial: /tmp/klipper_host_mcu
+
+[adxl345]
+cs_pin: rpi:None
+
+[resonance_tester]
+accel_chip: adxl345
+probe_points:
+    100, 100, 20  # an example
+```
+
+The picture on Klipper Documentation is wrong. Follow this.
+
+![adxl345](/FLSun_SR/assets/adxl345spi_bb.png)
+
+### Resonance Test
+
+Reference: https://www.klipper3d.org/Measuring_Resonances.html
+
+Make sure it works
+
+```
+ACCELEROMETER_QUERY
+```
+
+Test XY Axis
+```
+TEST_RESONANCES AXIS=Y
+```
+
+Generate visualisation
+```
+~/klipper/scripts/calibrate_shaper.py /tmp/resonances_x_*.csv -o /tmp/shaper_calibrate_x.png
+~/klipper/scripts/calibrate_shaper.py /tmp/resonances_y_*.csv -o /tmp/shaper_calibrate_y.png
+```
+
+Get resonance
+```
+TEST_RESONANCES AXIS=0,1 OUTPUT=raw_data
+TEST_RESONANCES AXIS=-0.866025404,-0.5 OUTPUT=raw_data
+TEST_RESONANCES AXIS=0.866025404,-0.5 OUTPUT=raw_data
+```
+
+```
+~/klipper/scripts/graph_accelerometer.py -c /tmp/raw_data_axis*.csv -o /tmp/resonances.png
+```
+
+## Extruder Settings
+
+I'm using [Mellow Libra Mini](https://www.aliexpress.com/item/1005003506182112.html), it's a Sherpa Mini cousin with Double Helical Gears
+
+### Klipper Config
+
+This is taken from Mellow's reply in Discord
+
+```
+[extruder]
+microsteps = 16
+step_pulse_duration: 0.000004
+rotation_distance: 21.34
+gear_ratio: 50:8
+nozzle_diameter = 0.4
+filament_diameter = 1.750
+max_extrude_cross_section = 100
+
+[tmc2209 extruder]
+run_current = 0.7
+```
+
+## Slicer
+
+Use [OrcaSlicer](https://github.com/SoftFever/OrcaSlicer)
+
+The Super Racer profile is not in there, use v400 or QQ, change the bed size and height and move on from there.
+
+## Mods
+
+- [NSK Xquad Fanduct](https://www.thingiverse.com/thing:4950102)
+- [Sherpa/Orbiter Housing](https://www.thingiverse.com/thing:5100991)
+- [Filament Spool Holder](https://www.thingiverse.com/thing:4950494)
+- [Tool Holder](https://www.thingiverse.com/thing:4890362)
+- [Cable Clip](https://www.thingiverse.com/thing:4878412)
+
+## Upcoming Mods
+
+### BDSensor
+
+#### Reference
+
+- https://mellow.klipper.cn/#/board/bd_sensor/klipper?id=%e5%ae%89%e8%a3%85-bdsensor
+
+### KAMP
+
+#### Reference
+
+- https://github.com/kyleisah/Klipper-Adaptive-Meshing-Purging
+
 ## Reference Config
 
+- https://github.com/danorder/All-In-One-V400-SR-Official-Klipper-
 - https://github.com/danorder/Flsun-super-racer-Full-klipper-config-
 - https://github.com/Guilouz/Klipper-Flsun-Speeder-Pad#update-super-racer-motherboard-firmware-mks-robin-nano-v30v31
 
 ## Resources
 
-https://3dprintbeginner.com/klipper-on-flsun-super-racer/
+- https://3dprintbeginner.com/klipper-on-flsun-super-racer/
+- https://github.com/makerbase-mks/Klipper-for-MKS-Boards/tree/main/MKS%20Robin%20Nano%20V3.x
+- https://github.com/nagimov/adxl345spi
+- https://www.klipper3d.org/Measuring_Resonances.html
+- https://www.klipper3d.org/RPi_microcontroller.html
+
