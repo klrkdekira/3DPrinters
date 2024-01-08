@@ -2,7 +2,7 @@
 
 ## Klipper preparation
 
-Use [Raspberry Pi Imager](https://www.raspberrypi.com/software/) 
+Use [Raspberry Pi Imager](https://www.raspberrypi.com/software/)
 
 ### On Linux
 
@@ -34,7 +34,7 @@ Rename `klipper.bin` to `Robin_nano_v3.bin`.
 
 Enable SPI mode via `raspi-config`.
 
-Install the following 
+Install the following
 
 ```
 sudo apt update
@@ -94,17 +94,20 @@ ACCELEROMETER_QUERY
 ```
 
 Test XY Axis
+
 ```
 TEST_RESONANCES AXIS=Y
 ```
 
 Generate visualisation
+
 ```
 ~/klipper/scripts/calibrate_shaper.py /tmp/resonances_x_*.csv -o /tmp/shaper_calibrate_x.png
 ~/klipper/scripts/calibrate_shaper.py /tmp/resonances_y_*.csv -o /tmp/shaper_calibrate_y.png
 ```
 
 Get resonance
+
 ```
 TEST_RESONANCES AXIS=0,1 OUTPUT=raw_data
 TEST_RESONANCES AXIS=-0.866025404,-0.5 OUTPUT=raw_data
@@ -146,6 +149,7 @@ The Super Racer profile is not in there, use v400 or QQ, change the bed size and
 ### OrcaSlicer
 
 Start
+
 ```
 M140 S0
 M104 S0
@@ -154,6 +158,7 @@ START_PRINT BED_TEMP=[bed_temperature_initial_layer_single] EXTRUDER_TEMP=[nozzl
 ```
 
 End
+
 ```
 END_PRINT
 ```
@@ -161,6 +166,7 @@ END_PRINT
 ### Cura
 
 Start
+
 ```
 ;Nozzle diameter = {machine_nozzle_size}
 ;Filament type = {material_type}
@@ -173,6 +179,7 @@ START_PRINT BED_TEMP={material_bed_temperature_layer_0} EXTRUDER_TEMP={material_
 ```
 
 End
+
 ```
 END_PRINT
 ```
@@ -180,6 +187,7 @@ END_PRINT
 ### PrusaSlicer
 
 Start
+
 ```
 M140 S0
 M104 S0
@@ -187,6 +195,7 @@ START_PRINT BED_TEMP=[first_layer_bed_temperature] EXTRUDER_TEMP=[first_layer_te
 ```
 
 End
+
 ```
 END_PRINT
 ```
@@ -213,6 +222,10 @@ END_PRINT
 
 - https://github.com/kyleisah/Klipper-Adaptive-Meshing-Purging
 
+## Print Volume
+
+![print volume](/FLSun_SR/assets/print_volume.webp)
+
 ## Reference Config
 
 - https://github.com/danorder/All-In-One-V400-SR-Official-Klipper-
@@ -226,4 +239,3 @@ END_PRINT
 - https://github.com/nagimov/adxl345spi
 - https://www.klipper3d.org/Measuring_Resonances.html
 - https://www.klipper3d.org/RPi_microcontroller.html
-
